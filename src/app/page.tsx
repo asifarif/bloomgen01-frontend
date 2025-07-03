@@ -5,7 +5,12 @@ import axios from "axios";
 
 export default function Home() {
   const [clo, setClo] = useState("");
-  const [result, setResult] = useState<any>(null);
+  type BloomResponse = {
+  clo: string;
+  suggested_verb: string;
+  sample_question: string;
+  };
+  const [result, setResult] = useState<BloomResponse | null>(null);
   const [error, setError] = useState("");
 
   const handleGenerate = async () => {
