@@ -17,10 +17,7 @@ export default function Home() {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/generate`,
-        null,
-        {
-          params: { clo },
-        }
+        { clo } // <-- now sending JSON body
       );
       setResult(response.data);
       setError("");
