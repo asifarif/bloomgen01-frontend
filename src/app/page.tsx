@@ -4,13 +4,15 @@
 import { useState } from "react";
 import axios from "axios";
 
-export default function Home() {
-  const [clo, setClo] = useState("");
-  type BloomResponse = {
-  clo: string;
+type BloomResponse = {
+  bloom_code: string;
+  bloom_level: string;
   suggested_verb: string;
   sample_question: string;
-  };
+};
+
+export default function Home() {
+  const [clo, setClo] = useState("");
   const [result, setResult] = useState<BloomResponse | null>(null);
   const [error, setError] = useState("");
 
@@ -18,10 +20,11 @@ export default function Home() {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/generate`,
-        { clo } // <-- now sending JSON body
+        { clo }
       );
       setResult(response.data);
       setError("");
+      console.log("✅ AI Response:", response.data); // Debug
     } catch (err) {
       setError("Failed to generate question. Please try again.");
       console.error(err);
@@ -49,9 +52,19 @@ export default function Home() {
       {error && <p className="text-red-600 mt-4">{error}</p>}
 
       {result && (
-        <div className="mt-6 bg-white p-6 rounded-lg shadow border">
-          <p className="text-lg"><strong>Suggested Verb:</strong> {result.suggested_verb}</p>
-          <p className="mt-2 text-lg"><strong>Sample Question:</strong> {result.sample_question}</p>
+        <div className="mt-6 bg-white p-6 rounded-lg shadow border space-y-2">
+          <p className="text-lg">
+            <strong>Bloom Code:</strong> <span className="text-blue-700">{result.bloom_code}</span>
+          </p>
+          <p className="text-lg">
+            <strong>Bloom Level:</strong> <span className="text-indigo-700">{result.bloom_level}</span>
+          </p>
+          <p className="text-lg">
+            <strong>Suggested Verb:</strong> {result.suggested_verb}
+          </p>
+          <p className="text-lg">
+            <strong>Sample Question:</strong> {result.sample_question}
+          </p>
         </div>
       )}
     </main>
