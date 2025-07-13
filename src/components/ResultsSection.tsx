@@ -1,4 +1,4 @@
-import { BloomResponse } from "./GeneratorSection"; // Adjust import path if needed
+import { BloomResponse } from "./types"; // Adjust path as needed
 
 type ResultsSectionProps = {
   result: BloomResponse[] | null;

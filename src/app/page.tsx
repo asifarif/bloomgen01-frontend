@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Link from "next/link";
+// import Link from "next/link"; // Removed unused import
 import HeroSection from "../components/HeroSection";
 import BloomLevelsSection from "../components/BloomLevelsSection";
 import GeneratorSection from "../components/GeneratorSection";
@@ -24,10 +24,12 @@ const bloomLevels = [
   { code: "C6", level: "Create", description: "Produce new or original work" },
 ];
 
+type BloomCode = "C1" | "C2" | "C3" | "C4" | "C5" | "C6";
+
 export default function Home() {
   const [clo, setClo] = useState("");
   const [topic, setTopic] = useState("");
-  const [bloomCode, setBloomCode] = useState("C2");
+  const [bloomCode, setBloomCode] = useState<BloomCode>("C2");
   const [verbs, setVerbs] = useState<string[]>([]);
   const [selectedVerbs, setSelectedVerbs] = useState<string[]>([]);
   const [result, setResult] = useState<BloomResponse[] | null>(null);
@@ -58,7 +60,7 @@ export default function Home() {
         verbs: selectedVerbs.length > 0 ? selectedVerbs : undefined
       });
       setResult(response.data.questions);
-    } catch (err) {
+    } catch {
       setError("Failed to generate questions. Please try again.");
     } finally {
       setIsGenerating(false);
@@ -71,6 +73,10 @@ export default function Home() {
     } else if (selectedVerbs.length < 3) {
       setSelectedVerbs([...selectedVerbs, verb]);
     }
+  };
+
+  const handleBloomCodeChange = (value: string) => {
+    setBloomCode(value as BloomCode);
   };
 
   return (
@@ -92,7 +98,7 @@ export default function Home() {
         error={error}
         onCloChange={setClo}
         onTopicChange={setTopic}
-        onBloomCodeChange={setBloomCode}
+        onBloomCodeChange={handleBloomCodeChange}
         onVerbToggle={toggleVerb}
         onGenerate={handleGenerate}
       />

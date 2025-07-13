@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 type GeneratorSectionProps = {
   clo: string;
   topic: string;
@@ -46,13 +44,13 @@ export default function GeneratorSection({
             <div className="text-center mb-10">
               <h2 className="text-3xl font-bold text-gray-800 mb-3">Generate Academic Questions</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Create customized questions based on Bloom's Taxonomy cognitive levels
+                Create customized questions based on Bloom&apos;s Taxonomy cognitive levels
               </p>
             </div>
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bloom's Taxonomy Level (Test)
+                Bloom&apos;s Taxonomy Level (Test)
               </label>
               <div className="relative select-container" style={{ position: 'relative', display: 'inline-block', width: '100%', maxWidth: '400px' }}>
                 <select
@@ -63,11 +61,7 @@ export default function GeneratorSection({
                     appearance: 'none',
                     WebkitAppearance: 'none',
                     MozAppearance: 'none',
-                    MsAppearance: 'none',
                     backgroundImage: 'none',
-                    WebkitBackgroundImage: 'none',
-                    MozBackgroundImage: 'none',
-                    MsBackgroundImage: 'none',
                     paddingRight: '40px',
                     overflow: 'hidden',
                   }}
@@ -104,7 +98,7 @@ export default function GeneratorSection({
                   </label>
                   <textarea
                     className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[120px]"
-                    placeholder="e.g., Newton's Laws of Motion, World War II causes..."
+                    placeholder="e.g., Newton&apos;s Laws of Motion, World War II causes..."
                     value={topic}
                     onChange={(e) => onTopicChange(e.target.value)}
                   />

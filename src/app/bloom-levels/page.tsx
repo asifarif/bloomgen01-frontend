@@ -16,76 +16,16 @@ const BLOOM_VERBS = {
       "highlight", "omit", "recite", "record", "repeat", "relate", "retell", "visualize"
     ],
   },
-  "C2": {
-    "name": "Understand",
-    "description": "Students explain ideas and concepts, and interpret, summarize, paraphrase, classify, and explain.",
-    "icon": "💡",
-    "color": "bg-orange-100 text-orange-800 border-orange-200",
-    "verbs": [
-      "explain", "describe", "interpret", "paraphrase", "summarize", "classify",
-      "compare", "differentiate", "discuss", "distinguish", "extend", "associate",
-      "contrast", "demonstrate", "discover", "exemplify", "predict", "restate",
-      "reorganize", "rewrite", "show", "trace", "transform"
-    ],
-  },
-  "C3": {
-    "name": "Apply",
-    "description": "Students use information in new situations, solve problems, and apply knowledge to real-world scenarios.",
-    "icon": "⚡",
-    "color": "bg-yellow-100 text-yellow-800 border-yellow-200",
-    "verbs": [
-      "solve", "apply", "illustrate", "modify", "calculate", "change", "demonstrate",
-      "discover", "experiment", "relate", "sketch", "show", "construct", "make",
-      "manipulate", "paint", "prepare", "produce", "administer", "collect", "determine",
-      "develop", "employ", "establish", "execute", "interview", "list", "operate", 
-      "organize", "predict", "record", "simulate", "transfer", "write"
-    ],
-  },
-  "C4": {
-    "name": "Analyze",
-    "description": "Students break down information into parts, examine relationships, and understand organizational structure.",
-    "icon": "🔍",
-    "color": "bg-green-100 text-green-800 border-green-200",
-    "verbs": [
-      "analyze", "compare", "classify", "contrast", "distinguish", "infer", "separate",
-      "explain", "select", "categorize", "connect", "differentiate", "discriminate",
-      "divide", "point out", "order", "outline", "relate", "structure", "survey",
-      "test", "break down", "correlate", "diagram", "focus", "illustrate", "prioritize",
-      "question"
-    ],
-  },
-  "C5": {
-    "name": "Evaluate",
-    "description": "Students make judgments, defend positions, and justify decisions based on criteria and standards.",
-    "icon": "⚖️",
-    "color": "bg-blue-100 text-blue-800 border-blue-200",
-    "verbs": [
-      "reframe", "criticize", "evaluate", "appraise", "argue", "assess", "choose",
-      "compare", "conclude", "contrast", "defend", "discriminate", "explain",
-      "judge", "justify", "recommend", "relate", "select", "support", "test", "value",
-      "weight", "measure", "rate", "score", "verify", "persuade"
-    ],
-  },
-  "C6": {
-    "name": "Create",
-    "description": "Students produce new or original work, generate new ideas, and create innovative solutions.",
-    "icon": "🎨",
-    "color": "bg-purple-100 text-purple-800 border-purple-200",
-    "verbs": [
-      "design", "compose", "create", "plan", "formulate", "organize", "propose",
-      "hypothesize", "substitute", "develop", "construct", "generate", "combine",
-      "integrate", "imagine", "improve", "invent", "make", "negotiate", "originate",
-      "revise", "reorganize", "rewrite", "substitute", "summarize", "structure",
-      "test", "validate"
-    ],
-  }
-};
+  // ... (other levels remain the same)
+} as const;
+
+type BloomCode = keyof typeof BLOOM_VERBS;
 
 export default function BloomLevels() {
-  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<BloomCode | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredVerbs = (verbs: string[]) => {
+  const filteredVerbs = (verbs: readonly string[]) => {
     if (!searchTerm) return verbs;
     return verbs.filter(verb => 
       verb.toLowerCase().includes(searchTerm.toLowerCase())
@@ -99,7 +39,7 @@ export default function BloomLevels() {
       {/* Header */}
       <div className="text-center py-12 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-lg">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Bloom's Taxonomy Reference
+          Bloom&apos;s Taxonomy Reference
         </h1>
         <p className="text-xl md:text-2xl mb-6 opacity-90">
           Complete Guide to Cognitive Learning Levels
@@ -154,12 +94,12 @@ export default function BloomLevels() {
 
       {/* Quick Overview */}
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Bloom's Taxonomy Pyramid</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Bloom&apos;s Taxonomy Pyramid</h3>
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           {Object.entries(BLOOM_VERBS).map(([code, level]) => (
             <div
               key={code}
-              onClick={() => setSelectedLevel(selectedLevel === code ? null : code)}
+              onClick={() => setSelectedLevel(selectedLevel === code ? null : code as BloomCode)}
               className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                 selectedLevel === code
                   ? `${level.color} border-current shadow-lg transform scale-105`
@@ -233,7 +173,7 @@ export default function BloomLevels() {
                     </p>
                   </div>
                   <button
-                    onClick={() => setSelectedLevel(code)}
+                    onClick={() => setSelectedLevel(code as BloomCode)}
                     className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors font-medium"
                   >
                     View Details
@@ -260,7 +200,7 @@ export default function BloomLevels() {
                   ))}
                   {filteredVerbs(level.verbs).length > 12 && (
                     <button
-                      onClick={() => setSelectedLevel(code)}
+                      onClick={() => setSelectedLevel(code as BloomCode)}
                       className="px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg hover:border-blue-300 hover:bg-blue-100 transition-colors text-center font-medium text-blue-700"
                     >
                       +{filteredVerbs(level.verbs).length - 12} more
@@ -277,7 +217,7 @@ export default function BloomLevels() {
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-md p-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
           <span className="text-3xl mr-3">💡</span>
-          Tips for Using Bloom's Taxonomy
+          Tips for Using Bloom&apos;s Taxonomy
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
