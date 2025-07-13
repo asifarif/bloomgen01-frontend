@@ -1,103 +1,108 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
+import HeroSection from "../components/HeroSection";
+import BloomLevelsSection from "../components/BloomLevelsSection";
+import GeneratorSection from "../components/GeneratorSection";
+import ResultsSection from "../components/ResultsSection";
 
-type Question = {
+type BloomResponse = {
   bloom_code: string;
   bloom_level: string;
   suggested_verb: string;
   sample_question: string;
 };
 
+const bloomLevels = [
+  { code: "C1", level: "Remember", description: "Recall facts and basic concepts" },
+  { code: "C2", level: "Understand", description: "Explain ideas or concepts" },
+  { code: "C3", level: "Apply", description: "Use information in new situations" },
+  { code: "C4", level: "Analyze", description: "Draw connections among ideas" },
+  { code: "C5", level: "Evaluate", description: "Justify a stand or decision" },
+  { code: "C6", level: "Create", description: "Produce new or original work" },
+];
+
 export default function Home() {
   const [clo, setClo] = useState("");
   const [topic, setTopic] = useState("");
-  const [bloomCode, setBloomCode] = useState("");
-  const [results, setResults] = useState<Question[]>([]);
+  const [bloomCode, setBloomCode] = useState("C2");
+  const [verbs, setVerbs] = useState<string[]>([]);
+  const [selectedVerbs, setSelectedVerbs] = useState<string[]>([]);
+  const [result, setResult] = useState<BloomResponse[] | null>(null);
   const [error, setError] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/verbs`)
+      .then(res => {
+        setVerbs(res.data[bloomCode]?.verbs || []);
+      });
+  }, [bloomCode]);
 
   const handleGenerate = async () => {
-    setError("");
-    setResults([]);
-
-    if (!clo || !topic || !bloomCode) {
-      setError("Please fill in all fields (CLO, Topic, and Bloom Level).");
+    if (!clo.trim() || !topic.trim()) {
+      setError("Please fill in both CLO and Topic fields");
       return;
     }
-
+    
+    setIsGenerating(true);
+    setError("");
+    
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/generate`,
-        { clo, topic, bloom_code: bloomCode }
-      );
-      setResults(response.data.questions); // expects array of 3 questions
-      console.log("✅ AI Response:", response.data);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/generate`, {
+        clo,
+        topic,
+        bloom_code: bloomCode,
+        verbs: selectedVerbs.length > 0 ? selectedVerbs : undefined
+      });
+      setResult(response.data.questions);
     } catch (err) {
       setError("Failed to generate questions. Please try again.");
-      console.error(err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const toggleVerb = (verb: string) => {
+    if (selectedVerbs.includes(verb)) {
+      setSelectedVerbs(selectedVerbs.filter(v => v !== verb));
+    } else if (selectedVerbs.length < 3) {
+      setSelectedVerbs([...selectedVerbs, verb]);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 p-10 text-gray-800 font-sans">
-      <h1 className="text-3xl font-bold mb-6 text-blue-900">BloomGen: AI-Based Question Generator</h1>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <HeroSection />
 
-      <label className="block mb-2 font-semibold">Course Learning Outcome (CLO)</label>
-      <textarea
-        className="w-full h-28 p-4 border border-gray-300 rounded-lg text-lg mb-4"
-        placeholder="Enter Course Learning Outcome (CLO)..."
-        value={clo}
-        onChange={(e) => setClo(e.target.value)}
+      {/* Bloom Levels Section */}
+      <BloomLevelsSection levels={bloomLevels} />
+
+      {/* Generator Section */}
+      <GeneratorSection
+        clo={clo}
+        topic={topic}
+        bloomCode={bloomCode}
+        verbs={verbs}
+        selectedVerbs={selectedVerbs}
+        isGenerating={isGenerating}
+        error={error}
+        onCloChange={setClo}
+        onTopicChange={setTopic}
+        onBloomCodeChange={setBloomCode}
+        onVerbToggle={toggleVerb}
+        onGenerate={handleGenerate}
       />
 
-      <label className="block mb-2 font-semibold">Topic or Context</label>
-      <input
-        type="text"
-        className="w-full p-4 border border-gray-300 rounded-lg text-lg mb-4"
-        placeholder="e.g., e-commerce models"
-        value={topic}
-        onChange={(e) => setTopic(e.target.value)}
+      {/* Results Section */}
+      <ResultsSection
+        result={result}
+        onBack={() => setResult(null)}
+        onGenerateNew={handleGenerate}
       />
-
-      <label className="block mb-2 font-semibold">Bloom Taxonomy Level</label>
-      <select
-        className="w-full p-4 border border-gray-300 rounded-lg text-lg mb-4"
-        value={bloomCode}
-        onChange={(e) => setBloomCode(e.target.value)}
-      >
-        <option value="">Select Bloom Level</option>
-        <option value="C1">C1 – Remember</option>
-        <option value="C2">C2 – Understand</option>
-        <option value="C3">C3 – Apply</option>
-        <option value="C4">C4 – Analyze</option>
-        <option value="C5">C5 – Evaluate</option>
-        <option value="C6">C6 – Create</option>
-      </select>
-
-      <button
-        onClick={handleGenerate}
-        className="mt-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded"
-      >
-        Generate Questions
-      </button>
-
-      {error && <p className="text-red-600 mt-4">{error}</p>}
-
-      {results.length > 0 && (
-        <div className="mt-6 space-y-6">
-          <h2 className="text-xl font-bold mb-2">Generated Questions:</h2>
-          {results.map((item, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow border space-y-2">
-              <p className="text-sm text-gray-500">Question #{index + 1}</p>
-              <p><strong>Bloom Code:</strong> {item.bloom_code}</p>
-              <p><strong>Bloom Level:</strong> {item.bloom_level}</p>
-              <p><strong>Suggested Verb:</strong> {item.suggested_verb}</p>
-              <p><strong>Sample Question:</strong> {item.sample_question}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </main>
+    </div>
   );
 }
